@@ -4,18 +4,24 @@ import { configs } from "./config";
 
 require("dotenv").config();
 
-const {  PRIVATE_KEY, ALCHEMY_PROVIDER } = configs;
-const config: HardhatUserConfig = {
+
+module.exports = {
   solidity: "0.8.17",
-  defaultNetwork: "goerli",
+  defaultNetwork: "hyperspace",
   networks: {
-    hardhat: {},
-    goerli: {
-      url: ALCHEMY_PROVIDER,
-      accounts:  [`0x${PRIVATE_KEY}`],
+    hyperspace: {
+      chainId: 3141,
+      url: "https://api.hyperspace.node.glif.io/rpc/v1",
+      accounts: [configs.PRIVATE_KEY.toString()],
     },
+  },
+  paths: {
+    sources: "./contracts",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts",
   },
 
 };
 
-export default config;
+//export default config;
