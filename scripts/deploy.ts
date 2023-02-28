@@ -1,29 +1,40 @@
-import { ethers } from "hardhat";
+import { artifacts, ethers } from "hardhat";
 import hre from "hardhat";
 import fs from "fs";
 
 
 
+
+
+const provider =  new ethers.providers.JsonRpcProvider("https://api.hyperspace.node.glif.io/rpc/v1");
+
 async function main() {
+  
+  
+  const feeData = await provider.getFeeData();
+  const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
   const Market = await hre.ethers.getContractFactory("Market");
-  const market_add = await Market.deploy();
+  const market_add = await Market.deploy({maxPriorityFeePerGas});
   await market_add.deployed();
   console.log("Market deployed to:", market_add.address);
-
-  fs.writeFileSync("./config.ts", 
-    `export const MarketplaceAddress` + ` = "${market_add.address}";`);
-
-  const data = {
-    address: market_add.address,
-    abi: market_add.interface.format("json"),
-  };
-
-  fs.writeFileSync("./Marketplace.json", JSON.stringify(data));
+  
+  // fs.writeFileSync("./config.ts", 
+  //   `export const MarketplaceAddress` + ` = "${market_add.address}";`);
+  
+  
+  
+  const PayPerView = await artifacts.readArtifact("PayPerView");
+  
+  //const Markets = await artifacts.readArtifactSync("Market");
+  
+  fs.writeFileSync("artifacts/Marketplace.json", JSON.stringify(PayPerView));
   
 }
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+
+main()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(error)
+        process.exit(1)
+
+    })
